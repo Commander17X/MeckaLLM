@@ -3,6 +3,43 @@
 ## Overview
 MeckaLLM is a cutting-edge AGI system that combines quantum computing principles with advanced machine learning techniques. The system features autonomous learning capabilities, quantum optimization, and real-time monitoring across multiple screens.
 
+## ⚠️ Important Usage Policy
+MeckaLLM is provided for research, educational, and personal use only. The following restrictions apply:
+
+### Prohibited Uses
+- ❌ Using MeckaLLM to gain unfair advantages in business or industry
+- ❌ Deploying the system for competitive intelligence or industrial espionage
+- ❌ Using the system to manipulate markets or create unfair competition
+- ❌ Employing MeckaLLM for any form of automated trading or market manipulation
+- ❌ Using the system to bypass security measures or access restricted systems
+- ❌ Deploying MeckaLLM for any form of surveillance without explicit consent
+- ❌ Using the system to generate or spread misinformation
+- ❌ Employing MeckaLLM for any form of automated decision-making that could harm individuals or organizations
+
+### Fair Use Guidelines
+- ✅ Research and academic purposes
+- ✅ Personal learning and development
+- ✅ Non-commercial experimentation
+- ✅ Educational demonstrations
+- ✅ Open-source contributions
+- ✅ Community-driven improvements
+
+### Terms of Use
+By using MeckaLLM, you agree to:
+1. Use the system only for permitted purposes
+2. Not use the system to gain unfair advantages
+3. Not deploy the system for industrial espionage
+4. Respect privacy and security of others
+5. Not use the system for market manipulation
+6. Report any potential misuse to the maintainers
+7. Follow all applicable laws and regulations
+
+Violation of these terms may result in:
+- Immediate revocation of access
+- Legal action if necessary
+- Public disclosure of violations
+- Permanent ban from the project
+
 ## Features
 - **Quantum-Enhanced Learning**: Utilizes quantum principles for optimization and decision-making
 - **Multi-Screen Support**: Intelligent task distribution across multiple displays
@@ -59,10 +96,10 @@ meckallm/
 ```
 
 ## Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. All contributors must agree to the usage policy and terms of use.
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for details. The license is subject to the usage policy and terms of use outlined above.
 
 ## Credits
 Created by Commander17X
@@ -79,6 +116,15 @@ For support, questions, or feature requests:
 - Special thanks to the quantum computing community
 - Inspired by advances in AGI research
 - Built with modern Python technologies
+
+## Reporting Misuse
+If you discover any misuse of MeckaLLM, please:
+1. Contact command19x. on Discord immediately
+2. Provide detailed information about the misuse
+3. Include any relevant evidence
+4. Maintain confidentiality of the report
+
+We take misuse seriously and will investigate all reports promptly.
 
 ## 🌟 Key Features
 
