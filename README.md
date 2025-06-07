@@ -1,6 +1,84 @@
-# MeckaLLM: Advanced AGI System
+# MeckaLLM - Advanced AGI System with Quantum Optimization
 
-MeckaLLM is a state-of-the-art Artificial General Intelligence (AGI) system that combines quantum computing principles with advanced language model architectures. Built on the foundation of DeepSeek-V3 and enhanced with quantum optimizations, MeckaLLM represents a significant advancement in AI capabilities.
+## Overview
+MeckaLLM is a cutting-edge AGI system that combines quantum computing principles with advanced machine learning techniques. The system features autonomous learning capabilities, quantum optimization, and real-time monitoring across multiple screens.
+
+## Features
+- **Quantum-Enhanced Learning**: Utilizes quantum principles for optimization and decision-making
+- **Multi-Screen Support**: Intelligent task distribution across multiple displays
+- **Autonomous Operation**: Self-learning and adaptation capabilities
+- **Resource Optimization**: Efficient CPU and GPU utilization
+- **Real-time Monitoring**: Comprehensive system metrics and quantum state tracking
+- **Dark Mode Interface**: Modern, eye-friendly user interface
+- **Progressive Learning**: Background learning from user activities
+- **Quantum Error Correction**: Advanced error handling and recovery
+- **Multi-Modal Processing**: Handles text, vision, and audio data
+- **Climate-Aware Computing**: Optimizes for energy efficiency
+
+## Installation
+```bash
+# Clone the repository
+git clone https://github.com/Commander17X/MeckaLLM.git
+cd MeckaLLM
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+## Usage
+```bash
+# Start the system
+python -m meckallm
+
+# Run the multi-brain demo
+python -m meckallm.examples.multi_brain_demo
+
+# Run the progressive learning demo
+python -m meckallm.examples.progressive_learning_demo
+```
+
+## System Requirements
+- Python 3.8+
+- CUDA-capable GPU (optional)
+- Multiple displays (optional)
+- 8GB+ RAM
+- 20GB+ free disk space
+
+## Project Structure
+```
+meckallm/
+├── agents/           # Autonomous agent implementations
+├── brain/           # Quantum brain and task coordination
+├── cli/             # Command-line interface
+├── core/            # Core system components
+├── learning/        # Learning algorithms
+├── quantum/         # Quantum computing components
+├── optimization/    # Resource optimization
+├── utils/           # Utility functions
+└── web/             # Web interface
+```
+
+## Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Credits
+Created by Commander17X
+- GitHub: [Commander17X](https://github.com/Commander17X)
+- Discord: command19x.
+
+## Support
+For support, questions, or feature requests:
+- Join our Discord server: [MeckaLLM Support](https://discord.gg/meckallm)
+- Contact: command19x. on Discord
+- Open an issue on GitHub
+
+## Acknowledgments
+- Special thanks to the quantum computing community
+- Inspired by advances in AGI research
+- Built with modern Python technologies
 
 ## 🌟 Key Features
 
@@ -21,48 +99,6 @@ MeckaLLM is a state-of-the-art Artificial General Intelligence (AGI) system that
 - **Quantum Load Balancing**: Dynamic resource allocation using quantum principles
 - **Real-time Monitoring**: Comprehensive system metrics and quantum state tracking
 - **Adaptive Learning**: Continuous optimization of quantum states and network topology
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Python 3.10+
-- CUDA-compatible GPU (NVIDIA or AMD)
-- 16GB+ RAM
-- 100GB+ free disk space
-
-### Installation
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/MeckaLLM.git
-cd MeckaLLM
-
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or
-.\venv\Scripts\activate  # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### Basic Usage
-```python
-from meckallm.core.model import MeckaLLM, MeckaConfig
-
-# Initialize model
-config = MeckaConfig(
-    num_qubits=8,
-    quantum_depth=4,
-    use_quantum_attention=True,
-    use_quantum_error_correction=True
-)
-model = MeckaLLM(config)
-
-# Generate text
-input_ids = tokenizer.encode("Your input text here")
-output = model.generate(input_ids)
-```
 
 ## 🏗️ Architecture
 
