@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeckaLLM Monitor</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .card {
+            background-color: #2d2d2d;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .metric-value {
+            color: #00ff9d;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-8">
+    <div class="container mx-auto">
+        <h1 class="text-4xl font-bold mb-8 text-center text-purple-400">MeckaLLM Monitor</h1>
+        
+        <!-- System Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-2">CPU Usage</h3>
+                <div class="metric-value" id="cpu-usage">0%</div>
+                <div class="chart-container mt-4">
+                    <canvas id="cpu-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-2">Memory Usage</h3>
+                <div class="metric-value" id="memory-usage">0%</div>
+                <div class="chart-container mt-4">
+                    <canvas id="memory-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-2">GPU Usage</h3>
+                <div class="metric-value" id="gpu-usage">0%</div>
+                <div class="chart-container mt-4">
+                    <canvas id="gpu-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-2">Quantum State</h3>
+                <div class="metric-value" id="quantum-state">0%</div>
+                <div class="chart-container mt-4">
+                    <canvas id="quantum-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Metrics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-4">System Metrics</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between">
+                        <span>CPU Temperature</span>
+                        <span id="cpu-temp">0°C</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>GPU Temperature</span>
+                        <span id="gpu-temp">0°C</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Memory Used</span>
+                        <span id="memory-used">0 GB</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-4">Quantum Metrics</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between">
+                        <span>Entanglement</span>
+                        <span id="quantum-entanglement">0%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Coherence</span>
+                        <span id="quantum-coherence">0%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Superposition</span>
+                        <span id="quantum-superposition">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts
+        const charts = {
+            cpu: createChart('cpu-chart', 'CPU Usage'),
+            memory: createChart('memory-chart', 'Memory Usage'),
+            gpu: createChart('gpu-chart', 'GPU Usage'),
+            quantum: createChart('quantum-chart', 'Quantum State')
+        };
+
+        function createChart(canvasId, label) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: label,
+                        data: [],
+                        borderColor: '#00ff9d',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#333'
+                            },
+                            ticks: {
+                                color: '#e0e0e0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: '#333'
+                            },
+                            ticks: {
+                                color: '#e0e0e0'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e0e0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // WebSocket connection
+        const ws = new WebSocket(`ws://${window.location.host}/ws`);
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            updateMetrics(data);
+        };
+
+        function updateMetrics(data) {
+            // Update CPU metrics
+            document.getElementById('cpu-usage').textContent = `${data.cpu.usage.toFixed(1)}%`;
+            document.getElementById('cpu-temp').textContent = `${data.cpu.temperature.toFixed(1)}°C`;
+            updateChart(charts.cpu, data.cpu.usage);
+
+            // Update Memory metrics
+            const memoryGB = data.memory.used / (1024 * 1024 * 1024);
+            document.getElementById('memory-usage').textContent = `${data.memory.percent.toFixed(1)}%`;
+            document.getElementById('memory-used').textContent = `${memoryGB.toFixed(1)} GB`;
+            updateChart(charts.memory, data.memory.percent);
+
+            // Update GPU metrics
+            if (Object.keys(data.gpu).length > 0) {
+                const gpu = Object.values(data.gpu)[0];
+                document.getElementById('gpu-usage').textContent = `${gpu.load.toFixed(1)}%`;
+                document.getElementById('gpu-temp').textContent = `${gpu.temperature.toFixed(1)}°C`;
+                updateChart(charts.gpu, gpu.load);
+            }
+
+            // Update Quantum metrics
+            document.getElementById('quantum-entanglement').textContent = 
+                `${(data.quantum_metrics.entanglement * 100).toFixed(1)}%`;
+            document.getElementById('quantum-coherence').textContent = 
+                `${(data.quantum_metrics.coherence * 100).toFixed(1)}%`;
+            document.getElementById('quantum-superposition').textContent = 
+                `${(data.quantum_metrics.superposition * 100).toFixed(1)}%`;
+            updateChart(charts.quantum, data.quantum_metrics.entanglement * 100);
+        }
+
+        function updateChart(chart, value) {
+            const now = new Date().toLocaleTimeString();
+            chart.data.labels.push(now);
+            chart.data.datasets[0].data.push(value);
+            
+            if (chart.data.labels.length > 20) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+            
+            chart.update();
+        }
+    </script>
+</body>
+</html> 
