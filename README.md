@@ -108,7 +108,6 @@ Created by Commander17X
 
 ## Support
 For support, questions, or feature requests:
-- Join our Discord server: [MeckaLLM Support](https://discord.gg/meckallm)
 - Contact: command19x. on Discord
 - Open an issue on GitHub
 
@@ -261,7 +260,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-For questions and support, please open an issue or contact us at support@meckallm.ai
+For questions and support, please open an issue or contact us via discord
 
 ---
 
