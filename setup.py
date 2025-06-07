@@ -1,27 +1,28 @@
 from setuptools import setup, find_packages
-import os
-
-# Read README.md safely with UTF-8 encoding
-def read_file(filename):
-    with open(filename, encoding='utf-8') as f:
-        return f.read()
 
 setup(
     name="meckallm",
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
-        "rich>=10.0.0",
-        "psutil>=5.9.0",
-        "typing-extensions>=4.0.0",
+        "docker>=7.0.0",
+        "pyyaml>=6.0.1",
+        "requests>=2.31.0",
+        "rich>=13.7.0",
+        "python-dotenv>=1.0.0",
+        "pyautogui>=0.9.53",
+        "keyboard>=0.13.5",
+        "selenium>=4.15.2",
+        "yt-dlp>=2023.11.16",
+        "psutil>=5.9.6",
+        "pywin32>=306",
+        "schedule>=1.2.1"
     ],
     python_requires=">=3.8",
-    author="Commander17X",
-    author_email="",
-    description="MeckaLLM - Advanced Learning and Monitoring System",
-    long_description=read_file("README.md") if os.path.exists("README.md") else "",
+    author="MeckaLLM Team",
+    description="AI-powered voice control system",
+    long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/Commander17X/MeckaLLM",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",

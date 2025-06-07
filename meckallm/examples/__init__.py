@@ -1,1 +1,3 @@
-"""Examples package for MeckaLLM.""" 
+"""
+Example scripts and demos for MeckaLLM
+""" 
