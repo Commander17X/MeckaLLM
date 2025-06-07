@@ -1,0 +1,91 @@
+{
+  "total_checks": 14,
+  "violations": 12,
+  "blocked_content": 12,
+  "violation_history": [
+    {
+      "timestamp": 1749285867.462532,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285867.9666417,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285868.4700952,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285868.9737117,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285869.4772458,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285869.9813063,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285870.4846566,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285870.9878764,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285871.4914634,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285871.9955704,
+      "category": "suspicious_url",
+      "violations": [
+        "Found suspicious URL: http://192.168.1.1/restricted"
+      ]
+    },
+    {
+      "timestamp": 1749285872.4986587,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    },
+    {
+      "timestamp": 1749285873.5040276,
+      "category": "content_obfuscation",
+      "violations": [
+        "Detected content obfuscation"
+      ]
+    }
+  ]
+}

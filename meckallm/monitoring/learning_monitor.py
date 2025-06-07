@@ -1,10 +1,11 @@
 import logging
-from typing import Optional, Dict, List, Any
+from typing import Optional, Dict, List, Any, Union
 from dataclasses import dataclass
 import time
 from pathlib import Path
 import json
 from .blacklist import BlacklistMonitor, BlacklistConfig
+import re
 
 @dataclass
 class MonitoringConfig:
@@ -14,123 +15,162 @@ class MonitoringConfig:
     alert_threshold: int = 5
 
 class LearningMonitor:
-    def __init__(self, config: Optional[MonitoringConfig] = None):
-        self.config = config or MonitoringConfig()
-        self.logger = logging.getLogger(__name__)
-        self._setup_logging()
-        
-        # Initialize blacklist monitor
-        self.blacklist = BlacklistMonitor()
-        
-        # Initialize monitoring state
-        self.violations_count = 0
-        self.last_save = time.time()
+    """Monitors learning activities and enforces blacklist rules."""
+    
+    def __init__(self, config: MonitoringConfig):
+        self.config = config
+        self.blacklist_monitor = BlacklistMonitor()
+        self.violations = 0
         self.monitoring_stats = {
             "total_checks": 0,
             "violations": 0,
             "blocked_content": 0,
-            "last_violation": None,
             "violation_history": []
         }
-
+        self._setup_logging()
+        self._last_save = time.time()
+    
     def _setup_logging(self):
-        """Setup logging configuration"""
+        """Set up logging configuration."""
         logging.basicConfig(
             filename=self.config.log_file,
             level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            format='%(asctime)s - %(levelname)s - %(message)s'
         )
-
+        self.logger = logging.getLogger(__name__)
+    
+    def _is_suspicious_url(self, url: str) -> bool:
+        """Check if a URL is suspicious using multiple detection methods."""
+        # Check for common URL obfuscation techniques
+        if re.search(self.blacklist_monitor.config.patterns["obfuscated_urls"], url):
+            return True
+        
+        # Check for IP addresses
+        if re.search(self.blacklist_monitor.config.patterns["ip_addresses"], url):
+            return True
+        
+        # Check for shortened URLs
+        if re.search(self.blacklist_monitor.config.patterns["shortened_urls"], url):
+            return True
+        
+        # Check for suspicious TLDs
+        if re.search(self.blacklist_monitor.config.patterns["suspicious_tlds"], url):
+            return True
+        
+        # Check for common bypass techniques in URL
+        bypass_patterns = [
+            r"(?i)(unblock|bypass|proxy|vpn|tor|anonym|hide|mask|conceal|evade|circumvent|avoid|dodge|escape|elude)",
+            r"(?i)([a-z0-9]+\.(?:com|net|org|io|co|me|info|biz|xyz|online|site|website|web|blog|shop|store|app|dev|tech|ai|cloud|host|server|service|solutions|systems|network|security|protection|defense|guard|shield|wall|barrier|fence|gate|door|lock|key|code|pass|secret|private|hidden|masked|concealed|obscured|veiled|cloaked|disguised|camouflaged|stealth|invisible|ghost|phantom|shadow|dark|black|deep|underground|hidden|secret|private|exclusive|premium|vip|elite|pro|advanced|expert|master|guru|ninja|hacker|cracker|exploiter|bypasser|unblocker|circumventer|evader|avoider|dodger|escaper|eluder))",
+            r"(?i)([a-z0-9]+[_-]?(?:unblock|bypass|proxy|vpn|tor|anonym|hide|mask|conceal|evade|circumvent|avoid|dodge|escape|elude)[_-]?[a-z0-9]*)",
+            r"(?i)([a-z0-9]+[_-]?(?:com|net|org|io|co|me|info|biz|xyz|online|site|website|web|blog|shop|store|app|dev|tech|ai|cloud|host|server|service|solutions|systems|network|security|protection|defense|guard|shield|wall|barrier|fence|gate|door|lock|key|code|pass|secret|private|hidden|masked|concealed|obscured|veiled|cloaked|disguised|camouflaged|stealth|invisible|ghost|phantom|shadow|dark|black|deep|underground|hidden|secret|private|exclusive|premium|vip|elite|pro|advanced|expert|master|guru|ninja|hacker|cracker|exploiter|bypasser|unblocker|circumventer|evader|avoider|dodger|escaper|eluder)[_-]?[a-z0-9]*)"
+        ]
+        
+        for pattern in bypass_patterns:
+            if re.search(pattern, url):
+                return True
+        
+        return False
+    
+    def _check_content_obfuscation(self, content: str) -> bool:
+        """Check for content obfuscation techniques."""
+        # Check for common obfuscation patterns
+        obfuscation_patterns = [
+            r"(?i)([a-z0-9]+[_-]?(?:unblock|bypass|proxy|vpn|tor|anonym|hide|mask|conceal|evade|circumvent|avoid|dodge|escape|elude)[_-]?[a-z0-9]*)",
+            r"(?i)([a-z0-9]+[_-]?(?:com|net|org|io|co|me|info|biz|xyz|online|site|website|web|blog|shop|store|app|dev|tech|ai|cloud|host|server|service|solutions|systems|network|security|protection|defense|guard|shield|wall|barrier|fence|gate|door|lock|key|code|pass|secret|private|hidden|masked|concealed|obscured|veiled|cloaked|disguised|camouflaged|stealth|invisible|ghost|phantom|shadow|dark|black|deep|underground|hidden|secret|private|exclusive|premium|vip|elite|pro|advanced|expert|master|guru|ninja|hacker|cracker|exploiter|bypasser|unblocker|circumventer|evader|avoider|dodger|escaper|eluder)[_-]?[a-z0-9]*)",
+            r"(?i)([a-z0-9]+[_-]?(?:unblock|bypass|proxy|vpn|tor|anonym|hide|mask|conceal|evade|circumvent|avoid|dodge|escape|elude)[_-]?[a-z0-9]*)",
+            r"(?i)([a-z0-9]+[_-]?(?:com|net|org|io|co|me|info|biz|xyz|online|site|website|web|blog|shop|store|app|dev|tech|ai|cloud|host|server|service|solutions|systems|network|security|protection|defense|guard|shield|wall|barrier|fence|gate|door|lock|key|code|pass|secret|private|hidden|masked|concealed|obscured|veiled|cloaked|disguised|camouflaged|stealth|invisible|ghost|phantom|shadow|dark|black|deep|underground|hidden|secret|private|exclusive|premium|vip|elite|pro|advanced|expert|master|guru|ninja|hacker|cracker|exploiter|bypasser|unblocker|circumventer|evader|avoider|dodger|escaper|eluder)[_-]?[a-z0-9]*)"
+        ]
+        
+        for pattern in obfuscation_patterns:
+            if re.search(pattern, content):
+                return True
+        
+        return False
+    
     def monitor_content(self, content: str, source: str) -> Dict[str, Any]:
-        """Monitor content for learning"""
+        """Monitor content for blacklist violations with enhanced detection."""
         self.monitoring_stats["total_checks"] += 1
         
-        # Check content against blacklist
-        violations = self.blacklist.get_violations(content)
-        has_violations = any(violations.values())
+        # Check for suspicious URLs in content
+        urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', content)
+        for url in urls:
+            if self._is_suspicious_url(url):
+                self._log_violation("suspicious_url", f"Found suspicious URL: {url}")
+                return self._create_blocked_response("suspicious_url", [f"Found suspicious URL: {url}"])
         
-        if has_violations:
-            self.violations_count += 1
-            self.monitoring_stats["violations"] += 1
-            self.monitoring_stats["last_violation"] = {
-                "timestamp": time.time(),
-                "source": source,
-                "violations": violations
-            }
-            self.monitoring_stats["violation_history"].append(
-                self.monitoring_stats["last_violation"]
-            )
+        # Check for content obfuscation
+        if self._check_content_obfuscation(content):
+            self._log_violation("content_obfuscation", "Detected content obfuscation")
+            return self._create_blocked_response("content_obfuscation", ["Detected content obfuscation"])
+        
+        # Check against blacklist
+        if not self.blacklist_monitor.is_allowed(content, source):
+            violations = self.blacklist_monitor.get_violations(content, source)
+            self._log_violation("blacklist", violations)
+            return self._create_blocked_response("blacklist", violations)
+        
+        return {"allowed": True, "violations": {}}
+    
+    def _create_blocked_response(self, category: str, violations: List[str]) -> Dict[str, Any]:
+        """Create a blocked response with violations."""
+        self.monitoring_stats["violations"] += 1
+        self.monitoring_stats["blocked_content"] += 1
+        self.monitoring_stats["violation_history"].append({
+            "timestamp": time.time(),
+            "category": category,
+            "violations": violations
+        })
+        return {"allowed": False, "violations": {category: violations}}
+    
+    def _log_violation(self, category: str, violations: Union[str, List[str]]):
+        """Log a violation with enhanced details."""
+        if isinstance(violations, str):
+            violations = [violations]
+        
+        for violation in violations:
+            self.logger.warning(f"Violation detected - Category: {category}, Details: {violation}")
             
-            # Trim violation history if too long
-            if len(self.monitoring_stats["violation_history"]) > self.config.max_violations:
-                self.monitoring_stats["violation_history"] = \
-                    self.monitoring_stats["violation_history"][-self.config.max_violations:]
-            
-            # Log violation
-            self.logger.warning(
-                f"Content violation detected from {source}: {violations}"
-            )
-            
-            # Check if we need to alert
-            if self.violations_count >= self.config.alert_threshold:
-                self._send_alert(violations, source)
-        
-        # Save monitoring stats periodically
-        if time.time() - self.last_save > self.config.save_interval:
-            self._save_stats()
-        
-        return {
-            "allowed": not has_violations,
-            "violations": violations,
-            "violations_count": self.violations_count
-        }
-
-    def _send_alert(self, violations: Dict[str, List[str]], source: str):
-        """Send alert about violations"""
-        alert_msg = f"ALERT: Multiple violations detected!\n"
-        alert_msg += f"Source: {source}\n"
-        alert_msg += f"Violations: {violations}\n"
-        alert_msg += f"Total violations: {self.violations_count}"
-        
+            if self.violations >= self.config.max_violations:
+                self._send_alert(category, violations)
+    
+    def _send_alert(self, category: str, violations: List[str]):
+        """Send an alert for multiple violations."""
+        alert_msg = f"ALERT: Multiple violations detected!\nCategory: {category}\nViolations: {', '.join(violations)}"
         self.logger.error(alert_msg)
-        # TODO: Implement actual alert mechanism (email, notification, etc.)
-
+        print(f"\n[bold red]{alert_msg}[/bold red]")
+    
     def _save_stats(self):
-        """Save monitoring statistics"""
-        try:
+        """Save monitoring statistics to file."""
+        current_time = time.time()
+        if current_time - self._last_save >= self.config.save_interval:
             stats_file = Path("monitoring_stats.json")
-            with open(stats_file, 'w') as f:
+            with open(stats_file, "w") as f:
                 json.dump(self.monitoring_stats, f, indent=2)
-            self.last_save = time.time()
-            self.logger.info("Monitoring stats saved successfully")
-        except Exception as e:
-            self.logger.error(f"Error saving monitoring stats: {str(e)}")
-
+            self._last_save = current_time
+    
     def get_stats(self) -> Dict[str, Any]:
-        """Get current monitoring statistics"""
-        return {
-            "monitoring_stats": self.monitoring_stats,
-            "blacklist_summary": self.blacklist.get_blacklist_summary(),
-            "violations_count": self.violations_count
-        }
-
+        """Get current monitoring statistics."""
+        self._save_stats()
+        return self.monitoring_stats
+    
     def reset_stats(self):
-        """Reset monitoring statistics"""
-        self.violations_count = 0
+        """Reset monitoring statistics."""
         self.monitoring_stats = {
             "total_checks": 0,
             "violations": 0,
             "blocked_content": 0,
-            "last_violation": None,
             "violation_history": []
         }
         self._save_stats()
-        self.logger.info("Monitoring stats reset")
-
-    def add_to_blacklist(self, category: str, items: List[str]):
-        """Add items to blacklist"""
-        self.blacklist.add_to_blacklist(category, items)
-
-    def remove_from_blacklist(self, category: str, items: List[str]):
-        """Remove items from blacklist"""
-        self.blacklist.remove_from_blacklist(category, items) 
+    
+    def add_to_blacklist(self, category: str, items: Union[str, List[str]]):
+        """Add items to the blacklist."""
+        self.blacklist_monitor.add_to_blacklist(category, items)
+    
+    def remove_from_blacklist(self, category: str, items: Union[str, List[str]]):
+        """Remove items from the blacklist."""
+        self.blacklist_monitor.remove_from_blacklist(category, items)
+    
+    def get_blacklist_summary(self) -> Dict[str, int]:
+        """Get a summary of blacklist items by category."""
+        return self.blacklist_monitor.get_blacklist_summary() 

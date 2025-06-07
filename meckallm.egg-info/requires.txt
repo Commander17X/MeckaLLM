@@ -1,0 +1,3 @@
+rich>=10.0.0
+psutil>=5.9.0
+typing-extensions>=4.0.0
